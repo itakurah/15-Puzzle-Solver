@@ -16,7 +16,6 @@ public abstract class AStar {
     private static final long KILOBYTES = 1024L;
     private static final PriorityQueue<Board> openList = new PriorityQueue<>(Comparator.comparing(Board::getFScore));
     private static final Set<Board> closedList = new HashSet<>();
-    private static int numOfExpandedBoards = 0;
 
     /**
      * Solves a valid given 15-puzzle using AStar algorithm
@@ -31,6 +30,7 @@ public abstract class AStar {
         Utils.checkInput(initialBoard);
         Board BoardCopy = new Board(initialBoard.getState());//copy board
         BoardCopy.setHeuristic(heuristic);
+        BoardCopy.setHScore(heuristic.calculate(BoardCopy));
         TimeUnit unit = switch (timeUnit) {
             case MS -> TimeUnit.MILLISECONDS;
             case NS -> TimeUnit.NANOSECONDS;
@@ -40,17 +40,10 @@ public abstract class AStar {
         //clear up
         openList.clear();
         closedList.clear();
-        numOfExpandedBoards = 0;
-        //
-        BoardCopy.setHScore(heuristic.calculate(BoardCopy));
+        int numOfExpandedBoards = 0;
         openList.add(BoardCopy);
-//        int g = 0;
         while (!openList.isEmpty()) {
             Board currentBoard = openList.poll();
-//            if(g<currentBoard.getgScore()){
-//                g = currentBoard.getgScore();
-//                System.out.println(g);
-//            }
             if (currentBoard.isSolution()) {
                 stopwatch.stop();
                 Runtime runtime = Runtime.getRuntime();
